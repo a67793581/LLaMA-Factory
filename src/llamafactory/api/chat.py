@@ -65,7 +65,15 @@ ROLE_MAPPING = {
     Role.FUNCTION: DataRole.FUNCTION.value,
     Role.TOOL: DataRole.OBSERVATION.value,
 }
-
+def is_url(s):
+    url_pattern = re.compile(
+        r'http[s]?://'  # http:// 或 https://
+        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # 域名
+        r'localhost|'  # localhost
+        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # IP 地址
+        r'(?::\d+)?'  # 可选端口号
+        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+    return bool(url_pattern.match(s))
 
 def _process_request(
     request: "ChatCompletionRequest",
@@ -113,6 +121,12 @@ def _process_request(
 
                     images.append(Image.open(image_stream).convert("RGB"))
         else:
+            if os.path.isfile(message.content):  # local file
+                image_stream = open(message.content, "rb")
+                images.append(Image.open(image_stream).convert("RGB"))
+            if is_url(message.content):
+                image_stream = requests.get(message.content, stream=True).raw
+                images.append(Image.open(image_stream).convert("RGB"))
             input_messages.append({"role": ROLE_MAPPING[message.role], "content": message.content})
 
     tool_list = request.tools

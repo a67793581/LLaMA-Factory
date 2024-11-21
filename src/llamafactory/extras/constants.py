@@ -850,6 +850,10 @@ register_model_group(
             DownloadSource.DEFAULT: "meta-llama/Llama-3.2-3B-Instruct",
             DownloadSource.MODELSCOPE: "LLM-Research/Llama-3.2-3B-Instruct",
         },
+        "Llama-3.2-11B-Vision-Instruct": {
+            DownloadSource.DEFAULT: "meta-llama/Llama-3.2-11B-Vision-Instruct",
+            DownloadSource.MODELSCOPE: "LLM-Research/Llama-3.2-11B-Vision-Instruct",
+        },
     },
     template="llama3",
 )
